@@ -5,6 +5,7 @@ import {
 } from 'react-router-dom'
 
 import Anecdote from './anecdote';
+import Notification from './notification';
 
 const Menu = () => {
   const padding = {
@@ -68,6 +69,7 @@ const CreateNew = (props) => {
       info,
       votes: 0
     })
+    props.history.push('/');
   }
 
   return (
@@ -93,7 +95,9 @@ const CreateNew = (props) => {
 
 }
 
-const App = () => {
+const RouteredCreateNew = withRouter(CreateNew);
+
+const App = (props) => {
   const [anecdotes, setAnecdotes] = useState([
     {
       content: 'If it hurts, do it more often',
@@ -116,6 +120,8 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = (Math.random() * 10000).toFixed(0)
     setAnecdotes(anecdotes.concat(anecdote))
+    setNotification(`a new anecdote ${anecdote.content} created!`);
+    setTimeout(() => setNotification(''), 10000);
   }
 
   const anecdoteById = (id) =>
@@ -134,15 +140,16 @@ const App = () => {
 
   return (
     <div>
-      <h1>Software anecdotes</h1>
       <Router>
+      <h1>Software anecdotes</h1>
         <Menu />
+        <Notification  notification={notification}/>
         <Route exact path="/" render={() => <AnecdoteList anecdotes={anecdotes} />} />
         <Route exact path="/anecdotes/:id" render={({ match }) =>
           <Anecdote anecdote={anecdoteById(match.params.id)} />
         } />
         <Route exact path="/about" render={() => <About />} />
-        <Route exact path="/create" render={() => <CreateNew addNew={addNew} />} />
+        <Route exact path="/create" render={() => <RouteredCreateNew addNew={addNew} />} />
       </Router>
       <Footer />
     </div>
